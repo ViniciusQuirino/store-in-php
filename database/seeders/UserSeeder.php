@@ -21,5 +21,14 @@ class UserSeeder extends Seeder
             'cpf' => '403.642.938-88',
             'type' => 'VENDEDOR',
         ]);
+
+        User::create([
+            'name' => 'Matheus',
+            'email' => 'matheus@gmail.com',
+            'age' => 22,
+            'password' => bcrypt('12345678'),
+            'cpf' => '403.642.938-89',
+            'type' => 'VENDEDOR',
+        ]);
     }
 }

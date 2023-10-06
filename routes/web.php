@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderProductController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -23,10 +25,21 @@ Route::view('dashboard', 'admin.dashboard')->name('admin.dashboard');
 
 Route::view('cart', 'cart')->name('user.cart');
 
-Route::post('/cart/{productId}', [CartController::class,'store'])->name('cart.create');
-Route::get('/cart', [CartController::class,'index'])->name('cart.index');
-Route::delete('/cart/{productId}', [CartController::class,'destroy'])->name('cart.destroy');
+Route::post('/order', [OrderController::class, 'store'])->name('create.order');
 
+// Route::view('checkout', 'checkout.form')->name('user.checkout');
+
+Route::get('/checkout', [OrderController::class, 'index'])->name('user.checkout');
+
+//cart
+Route::post('/cart/{productId}', [CartController::class, 'store'])->name('cart.create');
+Route::post('/update', [CartController::class, 'update'])->name('cart.update');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart', [CartController::class, 'destroy'])->name('cart.destroy');
+
+//order
+Route::get('/order', [OrderController::class, 'store'])->name('order.create');
+Route::get('/order-list', [OrderProductController::class, 'index'])->name('order.list');
 
 Route::view('createproduct', 'admin.createproduct')->name('admin.dashboard.create.product');
 Route::post('/createproduct', [ProductController::class, 'store'])->name('create.product');

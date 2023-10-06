@@ -18,6 +18,10 @@ class CartController extends Controller
     {
         $cart = Cart::firstWhere('user_id', auth()->user()->id);
 
+        if(is_null($cart)){
+            return view('cart');
+        }
+
         $found = CartProduct::where('cart_id', $cart->id)->first();
 
         $user = User::with('cart.cart_product.product')->find(auth()->user()->id);
@@ -38,7 +42,14 @@ class CartController extends Controller
             'cart' => $user->cart->toArray(),
         ];
 
-        return view('cart', compact('userData'));
+        $total = 0;
+
+        foreach ($userData['cart']['cart_product'] as $product) {
+            $subtotal = $product['product']['value'] * $product['amount'];
+            $total += $subtotal;
+        }
+
+        return view('cart', compact('userData', 'total'));
     }
 
     /**
@@ -71,50 +82,25 @@ class CartController extends Controller
                 $found->amount += 1;
                 $found->save();
 
-                $user = User::with('cart.cart_product.product')->find(auth()->user()->id);
+                $userData = $this->object();
 
-                $user->cart->cart_product = $user->cart->cart_product->map(function ($cartProduct) {
-                    unset($cartProduct->cart_id);
-                    unset($cartProduct->product_id);
-                    return $cartProduct;
-                });
-
-                $userData = [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'age' => $user->age,
-                    'cpf' => $user->cpf,
-                    'type' => $user->type,
-                    'cart' => $user->cart->toArray(),
-                ];
                 flash()->addSuccess('Produto adicionado no carrinho.');
-                return view('cart', compact('userData'));
+
+                return redirect()
+                    ->route('cart.index')
+                    ->with(compact('userData'));
             } else {
                 $cartProduct = new CartProduct();
                 $cartProduct->product_id = $productId;
                 $cartProduct->cart_id = $cart->id;
                 $cartProduct->save();
 
-                $user = User::with('cart.cart_product.product')->find(auth()->user()->id);
+                $userData = $this->object();
 
-                $user->cart->cart_product = $user->cart->cart_product->map(function ($cartProduct) {
-                    unset($cartProduct->cart_id);
-                    unset($cartProduct->product_id);
-                    return $cartProduct;
-                });
-
-                $userData = [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'age' => $user->age,
-                    'cpf' => $user->cpf,
-                    'type' => $user->type,
-                    'cart' => $user->cart->toArray(),
-                ];
                 flash()->addSuccess('Produto adicionado no carrinho.');
-                return view('cart', compact('userData'));
+                return redirect()
+                    ->route('cart.index')
+                    ->with(compact('userData'));
             }
         } else {
             $cart = Cart::create(['user_id' => auth()->user()->id]);
@@ -124,24 +110,11 @@ class CartController extends Controller
             $cartProduct->cart_id = $cart->id;
             $cartProduct->save();
 
-            $user = User::with('cart.cart_product.product')->find(auth()->user()->id);
+            $userData = $this->object();
 
-            $user->cart->cart_product = $user->cart->cart_product->map(function ($cartProduct) {
-                unset($cartProduct->cart_id);
-                unset($cartProduct->product_id);
-                return $cartProduct;
-            });
-
-            $userData = [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'age' => $user->age,
-                'cpf' => $user->cpf,
-                'type' => $user->type,
-                'cart' => $user->cart->toArray(),
-            ];
-            return view('cart', compact('userData'));
+            return redirect()
+                ->route('cart.index')
+                ->with(compact('userData'));
         }
     }
 
@@ -164,22 +137,44 @@ class CartController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Cart $cart)
+    public function update(Request $request)
     {
-        //
+        // dd($request->input('amount'));
+        $cart = CartProduct::where('product_id', $request->input('productId'))->first();
+
+        if ($cart) {
+            $cart->amount = $request->input('amount');
+
+            $cart->save();
+
+            $userData = $this->object();
+
+            return redirect()
+                ->route('cart.index')
+                ->with(compact('userData'));
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, $productId)
+    public function destroy(Request $request)
     {
-        $found = CartProduct::where('product_id', $productId)->first();
-        Log::info($found);
+        $found = CartProduct::where('product_id', $request->input('id'))->first();
+
         if ($found) {
             $found->delete();
         }
 
+        $userData = $this->object();
+
+        return redirect()
+            ->route('cart.index')
+            ->with(compact('userData'));
+    }
+
+    public function object()
+    {
         $user = User::with('cart.cart_product.product')->find(auth()->user()->id);
 
         $user->cart->cart_product = $user->cart->cart_product->map(function ($cartProduct) {
@@ -198,6 +193,6 @@ class CartController extends Controller
             'cart' => $user->cart->toArray(),
         ];
 
-        return view('cart', compact('userData'));
+        return $userData;
     }
 }

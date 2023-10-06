@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
+use App\Models\Order;
 use App\Models\OrderProduct;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class OrderProductController extends Controller
@@ -12,7 +15,36 @@ class OrderProductController extends Controller
      */
     public function index()
     {
-        //
+        $userData = User::with(['order.order_product.product'])
+            ->where('id', auth()->user()->id)
+            ->first();
+
+        $latestOrders = [];
+
+        foreach ($userData->order as $order) {
+            $orderData = $order->toArray();
+            $orderData['order_products'] = [];
+
+            foreach ($order->order_product as $orderProduct) {
+                $orderProductData = $orderProduct->toArray();
+                $orderProductData['product'] = $orderProduct->product->toArray();
+                $orderData['order_products'][] = $orderProductData;
+            }
+
+            $latestOrders[] = $orderData;
+        }
+
+        $result = [
+            'id' => $userData->id,
+            'name' => $userData->name,
+            'email' => $userData->email,
+            'age' => $userData->age,
+            'cpf' => $userData->cpf,
+            'type' => $userData->type,
+            'orders' => $latestOrders,
+        ];
+        // dd($result);
+        return view('order.myOrders', compact('result'));
     }
 
     /**

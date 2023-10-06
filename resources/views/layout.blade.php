@@ -25,9 +25,6 @@
                     <li class="nav-item">
                         <a class="nav-link" aria-current="page" href="{{ route('public.home') }}">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('auth.login') }}">Login</a>
-                    </li>
 
                     {{-- <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -40,19 +37,27 @@
                   <li><a class="dropdown-item" href="#">Something else here</a></li>
                 </ul>
               </li> --}}
-                    <li class="nav-item">
-                        <a class="nav-link" aria-disabled="true" href="{{ route('auth.register') }}">Criar Conta</a>
-                    </li>
                     @if (auth()->check())
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('auth.login.logout') }}">Sair</a>
-                        </li>
-
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.dashboard.create.product') }}">Criar Produto</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('cart.index') }}">Carrinho</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('order.list') }}">Meus pedidos</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('auth.login.logout') }}">Sair</a>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('auth.login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-disabled="true" href="{{ route('auth.register') }}">Criar Conta</a>
                         </li>
                     @endif
 
@@ -82,6 +87,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous">
     </script>
+
 
 </body>
 

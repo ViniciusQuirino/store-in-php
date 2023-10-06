@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('adrresses', function (Blueprint $table) {
+        Schema::create('addresses', function (Blueprint $table) {
             $table->uuid('id')->primary('id');
 
             $table->string('street', 100);
-            $table->integer('number');
-            $table->string('destrict', 100);
+            $table->string('number');
+           
             $table->string('city', 100);
-            $table->string('complement', 255);
+           
             $table->string('zip_code', 8);
 
             $table->uuid('user_id');
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('adrresses');
+        Schema::dropIfExists('addresses');
     }
 };
